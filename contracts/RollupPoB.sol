@@ -18,7 +18,7 @@ contract RollupPoB is RollupPoBHelpers{
     uint256 constant beneficiaryAddressInput = 9;
 
     // Defines slot/era block duration
-    uint constant public DELAY_GENESIS = 1000;
+    uint constant public DELAY_GENESIS = 10;
     uint32 constant public BLOCKS_PER_SLOT = 100;
     uint constant public SLOT_DEADLINE = 20;
 
