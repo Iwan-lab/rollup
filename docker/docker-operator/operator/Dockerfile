@@ -1,6 +1,6 @@
 FROM node:10
-ARG branch=master
-RUN git clone https://github.com/iden3/rollup.git
+ARG branch=iwanlab/iwan-dev
+RUN git clone https://github.com/Iwan-lab/rollup.git
 RUN mkdir table-conversion
 
 # Download and install dependencies
