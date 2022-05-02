@@ -212,16 +212,21 @@ class Synchronizer {
 
                 // get last state saved
                 const stateSaved = await this.getStateFromBatch(lastBatchSaved);
+                this.logger.info("SYNCH Message info: -- loop 2.1 --");
+                this.logger.info("SYNCH Message info: state saved block number is ~ " + stateSaved.blockNumber);
 
                 // check last batch number matches. Last state saved should match state in contract
                 const stateDepth = parseInt(await this.rollupContract.methods.getStateDepth()
                     .call({from: this.ethAddress}, stateSaved.blockNumber));
+                this.logger.info("SYNCH Message info: -- loop 2.2 --");
 
                 if (lastBatchSaved > 0 && stateDepth !== lastBatchSaved){
+                    this.logger.info("SYNCH Message info: -- loop 2.3 --");
                     // clear database
                     await this._clearRollback(lastBatchSaved);
                     this._infoRollback(lastBatchSaved - 1, "Contract State depth does not match last state depth saved");
                     await this._rollback(lastBatchSaved);
+                    this.logger.info("SYNCH Message info: -- loop 2.4 --");
                     continue;
                 }
                 this.logger.info("SYNCH Message info: -- loop 3 --");
