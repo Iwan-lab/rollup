@@ -572,6 +572,7 @@ class TXPool {
 
         const tmpState = new TmpState(this.rollupDB, this.feeDeposit, this.ethPrice, this.conversion, Object.assign({}, tmpStates)); 
         let currentDeposits = 0;
+        console.log("---------- fillBatch -------, tx pool length is: " + availableTxs.length);
         while (availableTxs.length>0) {
             const tx = availableTxs.pop();
             const res = await tmpState.canProcess(tx);
@@ -586,7 +587,8 @@ class TXPool {
                         currentDeposits++;
                     }
                 }
-                await tmpState.process(tx);
+                const a = await tmpState.process(tx);
+                console.log("------------ fillBatch --------, process success: " + a);
                 if (!txsByCoin[tx.coin]) txsByCoin[tx.coin] = [];
                 txsByCoin[tx.coin].push(tx);
 

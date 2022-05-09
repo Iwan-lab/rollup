@@ -201,35 +201,27 @@ class Synchronizer {
         // eslint-disable-next-line no-constant-condition
         while (true) {
             try {
-                this.logger.info("SYNCH Message info: -- loop 1 --");
                 // get last block synched, current block, last batch synched
                 let totalSynch = 0;
                 let lastBatchSaved = await this.getLastBatch();
                 const currentBlock = await this.web3.eth.getBlockNumber();
                 const currentBatchDepth = await this.rollupContract.methods.getStateDepth()
                     .call({from: this.ethAddress}, currentBlock);
-                this.logger.info("SYNCH Message info: -- loop 2 --");
 
                 // get last state saved
                 const stateSaved = await this.getStateFromBatch(lastBatchSaved);
-                this.logger.info("SYNCH Message info: -- loop 2.1 --");
-                this.logger.info("SYNCH Message info: state saved block number is ~ " + stateSaved.blockNumber);
 
                 // check last batch number matches. Last state saved should match state in contract
                 const stateDepth = parseInt(await this.rollupContract.methods.getStateDepth()
                     .call({from: this.ethAddress}, stateSaved.blockNumber));
-                this.logger.info("SYNCH Message info: -- loop 2.2 --");
 
                 if (lastBatchSaved > 0 && stateDepth !== lastBatchSaved){
-                    this.logger.info("SYNCH Message info: -- loop 2.3 --");
                     // clear database
                     await this._clearRollback(lastBatchSaved);
                     this._infoRollback(lastBatchSaved - 1, "Contract State depth does not match last state depth saved");
                     await this._rollback(lastBatchSaved);
-                    this.logger.info("SYNCH Message info: -- loop 2.4 --");
                     continue;
                 }
-                this.logger.info("SYNCH Message info: -- loop 3 --");
                     
                 // Check root matches with the one saved
                 const stateRoot = Scalar.e(await this.rollupContract.methods.getStateRoot(stateDepth)
@@ -244,7 +236,6 @@ class Synchronizer {
                     await this._rollback(lastBatchSaved);
                     continue;
                 }
-                this.logger.info("SYNCH Message info: -- loop 4 --");
 
                 // Check current mining onChain hash
                 const stateMiningOnChainHash = Scalar.e(await this.rollupContract.methods.miningOnChainTxsHash()
@@ -258,7 +249,6 @@ class Synchronizer {
                     await this._rollback(lastBatchSaved);
                     continue;
                 }
-                this.logger.info("SYNCH Message info: -- loop 5 --");
 
                 // update deposit fee
                 this.feeDepOffChain = Scalar.e(await this.rollupContract.methods.depositFee()
@@ -267,7 +257,6 @@ class Synchronizer {
                 // update on-chain fee
                 this.feeOnChainTx = Scalar.e(await this.rollupContract.methods.feeOnchainTx()
                     .call({from: this.ethAddress}));
-                    this.logger.info("SYNCH Message info: -- loop 6 --");
                   
                 if (currentBatchDepth > lastBatchSaved) {
                     this.logger.info("SYNCH Message info: -- loop 6.1 --");
@@ -298,7 +287,6 @@ class Synchronizer {
                 this._fillInfo(currentBlock, stateSaved.blockNumber, currentBatchDepth, lastBatchSaved);
 
                 if (lastBatchSaved >= currentBatchDepth) await timeout(this.timeouts.NEXT_LOOP);
-                this.logger.info("SYNCH Message info: -- loop 7 --");
             } catch (e) {
                 this.logger.error(`SYNCH Message error: ${e.message}`);
                 this.logger.debug(`SYNCH Message error: ${e.stack}`);

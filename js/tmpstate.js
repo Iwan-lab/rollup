@@ -79,19 +79,29 @@ class TmpState {
      * @returns {Boolean} Return true if the transaction is correctly processed, false otherwise
      */
     async process(tx) { 
+        console.log("----------- process tx ----- 1");
         const stFrom = await this.getState(tx.fromIdx);
         if (!stFrom || stFrom.ax != tx.fromAx || stFrom.ay != tx.fromAy) return false;
 
         // Check nonce
-        if (tx.nonce != stFrom.nonce) return false;
+        if (tx.nonce != stFrom.nonce){
+            console.log("----------- process tx ----- 1.1");
+            return false;
+        }
 
         // Check there is enough funds
         const amount = utils.float2fix(utils.fix2float(tx.amount));
         const fee = utils.computeFee(tx.amount, tx.fee);
-        if (!Scalar.geq(stFrom.amount, Scalar.add(fee, amount))) return false;
+        if (!Scalar.geq(stFrom.amount, Scalar.add(fee, amount))){
+            console.log("----------- process tx ----- 1.2");
+            return false;
+        }
 
         // Check onChain flag
-        if (tx.onChain) return false;
+        if (tx.onChain){
+            console.log("----------- process tx ----- 1.3");
+            return false;
+        }
 
         stFrom.nonce++;
         stFrom.amount = Scalar.sub(stFrom.amount, amount);
@@ -101,16 +111,24 @@ class TmpState {
             let stTo;
             if (tx.toIdx) {
                 stTo = await this.getState(tx.toIdx);
-                if (!stTo) return false;
+                if (!stTo){
+                    console.log("----------- process tx ----- 1.4");
+                    return false;
+                }
                 // Check coins match
-                if (stTo.coin != stFrom.coin || stFrom.coin != tx.coin) return false;
+                if (stTo.coin != stFrom.coin || stFrom.coin != tx.coin){
+                    console.log("----------- process tx ----- 1.5");
+                    return false;
+                }
                 stTo.amount = Scalar.add(stTo.amount, amount);
             }
         } else {
             if (tx.toIdx) {
+                console.log("----------- process tx ----- 1.6");
                 return false;
             }
             if (!this._checkFeeDeposit(tx)){
+                console.log("----------- process tx ----- 1.7");
                 return false;
             }
             // Check leaf don't exist yet
@@ -124,10 +142,12 @@ class TmpState {
                     amount: tx.amount,
                 };
             } else {
+                console.log("----------- process tx ----- 1.8");
                 return false;
             }
         }
 
+        console.log("----------- process tx ----- 2");
         return true;
     }
 
