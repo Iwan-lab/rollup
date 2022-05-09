@@ -575,6 +575,7 @@ class TXPool {
         console.log("---------- fillBatch -------, tx pool length is: " + availableTxs.length);
         while (availableTxs.length>0) {
             const tx = availableTxs.pop();
+            console.log(tx);
             const res = await tmpState.canProcess(tx);
 
             if (res == "YES") {
